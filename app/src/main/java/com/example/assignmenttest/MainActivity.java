@@ -17,11 +17,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, stackOverflowFragment.OnFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener, stackOverflowFragment.OnFragmentInteractionListener, WeatherFragment.OnFragmentInteractionListener{
 
     private stackOverflowFragment stack_Overflow;
+    private WeatherFragment weatherFragment ;
+    private boolean isStartup = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,12 +91,16 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         stack_Overflow = new stackOverflowFragment();
-        Fragment home_nav = getSupportFragmentManager().findFragmentById(R.id.content_main);
+        weatherFragment = new WeatherFragment();
+        if(isStartup) {
+            //((TextView) findViewById(R.id.textView2)).removeAllViews();
+            isStartup = false;
+        }
 
         if (id == R.id.nav_Home) {
-            setFragment(home_nav);
+            setFragment(weatherFragment, "weather");
         } else if (id == R.id.nav_stackOverflow) {
-            setFragment(stack_Overflow);
+            setFragment(stack_Overflow, "stackOverflow");
         } else if (id == R.id.nav_LogOut) {
             finishAndRemoveTask();
         }
@@ -102,12 +110,11 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void setFragment(Fragment fragment) {
+    private void setFragment(Fragment fragment, String fragmentName) {
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.content_main, fragment);
+        fragmentTransaction.replace(R.id.content, fragment, fragmentName);
         fragmentTransaction.commit();
-        //hello
     }
 
     @Override
