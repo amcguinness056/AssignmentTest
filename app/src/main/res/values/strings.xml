@@ -9,4 +9,9 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="editText_username">Username</string>
+    <string name="editText_password">Password</string>
+    <string name="editText_email">Email</string>
+    <string name="button_signIn">Sign In</string>
+    <string name="textView_SignUp">Don\'t have an account? Register here!</string>
 </resources>
