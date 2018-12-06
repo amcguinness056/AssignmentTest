@@ -99,6 +99,7 @@ public class LoginActivity extends AppCompatActivity {
                 if(userPassword.equals(storedPassword)){
                     Toast.makeText(LoginActivity.this, "Login Succesfull", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    intent.putExtra("username", userName);
                     startActivity(intent);
                 }
                 else{
