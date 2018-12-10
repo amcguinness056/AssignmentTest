@@ -26,7 +26,7 @@
         android:layout_marginStart="48dp"
         android:layout_marginTop="7dp"
         android:scaleType="centerCrop"
-        android:src="@mipmap/stackOverflow_logo" />
+        android:src="@mipmap/stackoverflow_logo" />
 
     <TableLayout
         android:layout_width="324dp"
@@ -37,16 +37,20 @@
         android:layout_marginTop="136dp">
 
         <TableRow
+            android:id="@+id/tableRow_questionOne"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="25">
+            android:layout_weight="25"
+            android:padding="5dp">
 
             <TextView
                 android:id="@+id/textView_question1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_weight="80"
-                android:text="Question 1" />
+                android:text="Question 1"
+                android:textSize="16sp" />
 
             <ImageView
                 android:id="@+id/imageView4"
@@ -58,16 +62,20 @@
         </TableRow>
 
         <TableRow
+            android:id="@+id/tableRow_questionTwo"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="25">
+            android:layout_height="92dp"
+            android:layout_weight="25"
+            android:padding="5dp">
 
             <TextView
                 android:id="@+id/textView_question2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_weight="80"
-                android:text="Question 2" />
+                android:text="Question 2"
+                android:textSize="16sp" />
 
             <ImageView
                 android:id="@+id/imageView5"
@@ -79,16 +87,20 @@
         </TableRow>
 
         <TableRow
+            android:id="@+id/tableRow_questionThree"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="25">
+            android:layout_weight="25"
+            android:padding="5dp">
 
             <TextView
                 android:id="@+id/textView_question3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_weight="80"
-                android:text="Question 3" />
+                android:text="Question 3"
+                android:textSize="16sp" />
 
             <ImageView
                 android:id="@+id/imageView6"
@@ -100,16 +112,20 @@
         </TableRow>
 
         <TableRow
+            android:id="@+id/tableRow_questionFour"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="25">
+            android:layout_weight="25"
+            android:padding="5dp">
 
             <TextView
                 android:id="@+id/textView_question4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_weight="80"
-                android:text="Question 4" />
+                android:text="Question 4"
+                android:textSize="16sp" />
 
             <ImageView
                 android:id="@+id/imageView7"

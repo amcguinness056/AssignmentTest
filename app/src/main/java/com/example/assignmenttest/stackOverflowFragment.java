@@ -2,6 +2,7 @@ package com.example.assignmenttest;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -12,9 +13,16 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
+import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -35,6 +43,16 @@ import java.util.HashMap;
 
 public class stackOverflowFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
+    TextView question1;
+    TextView question2;
+    TextView question3;
+    TextView question4;
+    SearchView questionSearch;
+    TableRow tableRowQuestionOne;
+    TableRow tableRowQuestionTwo;
+    TableRow tableRowQuestionThree;
+    TableRow tableRowQuestionFour;
+    HashMap<String, String> questionList = new HashMap<String, String>();
 
 
     public stackOverflowFragment() {
@@ -53,7 +71,68 @@ public class stackOverflowFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_stack_overflow, container, false);
+        View view = inflater.inflate(R.layout.fragment_stack_overflow, container, false);
+        question1 = view.findViewById(R.id.textView_question1);
+        question2 = view.findViewById(R.id.textView_question2);
+        question3 = view.findViewById(R.id.textView_question3);
+        question4 = view.findViewById(R.id.textView_question4);
+        questionSearch = view.findViewById(R.id.searchView_question);
+        tableRowQuestionOne = view.findViewById(R.id.tableRow_questionOne);
+        tableRowQuestionTwo = view.findViewById(R.id.tableRow_questionTwo);
+        tableRowQuestionThree = view.findViewById(R.id.tableRow_questionThree);
+        tableRowQuestionFour = view.findViewById(R.id.tableRow_questionFour);
+
+        if(questionList.size() != 0){
+            question1.setText(questionList.get("question 1"));
+            question2.setText(questionList.get("question 2"));
+            question3.setText(questionList.get("question 3"));
+            question4.setText(questionList.get("question 4"));
+        }
+        else{
+            getInitialQuestions();
+        }
+
+        tableRowQuestionOne.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onTableRowClicked("one");
+            }
+        });
+        tableRowQuestionTwo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onTableRowClicked("two");
+            }
+        });
+        tableRowQuestionThree.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onTableRowClicked("three");
+            }
+        });
+        tableRowQuestionFour.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onTableRowClicked("four");
+            }
+        });
+
+        questionSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                getQuestions(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
+
+
+        return view;
     }
 
 
@@ -79,81 +158,90 @@ public class stackOverflowFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-//    private class GetStackOverflowQuestion extends AsyncTask<String, Void, HashMap<String, String>> {
-//
-//        @Override
-//        protected HashMap<String, String> doInBackground(String... strings) {
-//            HashMap<String, String> weatherDetails = new HashMap<String, String>();
-//            String temperature = "UNDEFINED";
-//            String windSpeed = "UNDEFINED";
-//            String humidity = "UNDEFINED";
-//            String weatherSummary = "UNDEFINED";
-//
-//            try{
-//                URL url = new URL(strings[0]);
-//                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-//
-//                InputStream stream = new BufferedInputStream(urlConnection.getInputStream());
-//                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
-//                StringBuilder builder = new StringBuilder();
-//
-//                String inputString;
-//                while((inputString = bufferedReader.readLine()) != null){
-//                    builder.append(inputString);
-//                }
-//
-//                JSONObject topLevel = new JSONObject(builder.toString());
-//                JSONObject main = topLevel.getJSONObject("main");
-//                JSONObject wind = topLevel.getJSONObject("wind");
-//                JSONArray weatherArray = topLevel.getJSONArray("weather");
-//                temperature = String.valueOf(main.getDouble("temp"));
-//                humidity = String.valueOf(main.getDouble("humidity"));
-//                windSpeed = String.valueOf(wind.getDouble("speed"));
-//                weatherDetails.put("temperature", temperature);
-//                weatherDetails.put("windSpeed", windSpeed);
-//                weatherDetails.put("humidity", humidity);
-//                JSONObject weather = new JSONObject();
-//                for(int i = 0; i< weatherArray.length(); i++){
-//                    weather = weatherArray.getJSONObject(i);
-//                }
-//                weatherSummary = String.valueOf(weather.getString("main"));
-//                weatherDetails.put("summary", weatherSummary);
-//
-//                urlConnection.disconnect();
-//            } catch (IOException | JSONException e){
-//                e.printStackTrace();
-//            }
-//
-//            return weatherDetails;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(HashMap<String, String> weatherDetails){
-//            temperatureValue.setText(weatherDetails.get("temperature") + "C");
-//            windSpeedValue.setText(weatherDetails.get("windSpeed") + "mph");
-//            humidityValue.setText(weatherDetails.get("humidity") + "%");
-//
-//            switch (weatherDetails.get("summary")){
-//                case "Clouds":
-//                    weatherPicture.setImageResource(R.mipmap.icons8_partly_cloudy_day_96);
-//                    break;
-//                case "Rain":
-//                    weatherPicture.setImageResource(R.mipmap.icons8_rain_96);
-//                    break;
-//                case "Sun":
-//                    weatherPicture.setImageResource(R.mipmap.icons8_sun_96);
-//                    break;
-//                case "Clear":
-//                    weatherPicture.setImageResource(R.mipmap.icons8_sun_96);
-//                    break;
-//                case "Snow":
-//                    weatherPicture.setImageResource(R.mipmap.icons8_snow_96);
-//                    break;
-//                default:
-//                    weatherPicture.setImageResource(R.mipmap.icons8_partly_cloudy_day_96);
-//            }
-//        }
-//    }
+    public void getQuestions(String question){
+            String url = "http://api.stackexchange.com/2.2/search?order=desc&sort=activity&intitle="
+                    + question
+                    + "&site=stackoverflow";
+            new GetStackOverflowQuestion().execute(url);
+    }
+
+    public void getInitialQuestions(){
+        String url = "https://api.stackexchange.com/2.2/questions/featured?order=desc&sort=activity&site=stackoverflow";
+
+        new GetStackOverflowQuestion().execute(url);
+    }
+
+    public void onTableRowClicked(String question){
+        Fragment fragment = new SOQuestionDetails();
+        Bundle args = new Bundle();
+        if(question.equals("one")){
+            args.putString("questionLink", questionList.get("questionLink 1"));
+        }
+        else if(question.equals("two")){
+            args.putString("questionLink", questionList.get("questionLink 2"));
+        }
+        else if(question.equals("three")){
+            args.putString("questionLink", questionList.get("questionLink 3"));
+        }
+        else if(question.equals("four")){
+            args.putString("questionLink", questionList.get("questionLink 4"));
+        }
+        fragment.setArguments(args);
+
+        if(fragment != null){
+            FragmentManager fragmentManager = getFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.content_main, fragment);
+            fragmentTransaction.addToBackStack("SOQuestions");
+            fragmentTransaction.commit();
+        }
+    }
+
+    private class GetStackOverflowQuestion extends AsyncTask<String, Void, HashMap<String, String>> {
+
+        @Override
+        protected HashMap<String, String> doInBackground(String... strings) {
+
+
+            try{
+                URL url = new URL(strings[0]);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+
+                InputStream stream = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
+                StringBuilder builder = new StringBuilder();
+
+                String inputString;
+                while((inputString = bufferedReader.readLine()) != null){
+                    builder.append(inputString);
+                }
+
+                JSONObject topLevel = new JSONObject(builder.toString());
+                JSONArray items = topLevel.getJSONArray("items");
+                for(int i = 0; i < items.length(); i++){
+                    JSONObject question = items.getJSONObject(i);
+                    String questionString = question.getString("title");
+                    String questionLink = question.getString("link");
+                    questionList.put("question " + (i+1), questionString);
+                    questionList.put("questionLink " + (i+1), questionLink);
+                }
+
+                urlConnection.disconnect();
+            } catch (IOException | JSONException e){
+                e.printStackTrace();
+            }
+
+            return questionList;
+        }
+
+        @Override
+        protected void onPostExecute(HashMap<String, String> questionList){
+            question1.setText(questionList.get("question 1"));
+            question2.setText(questionList.get("question 2"));
+            question3.setText(questionList.get("question 3"));
+            question4.setText(questionList.get("question 4"));
+        }
+    }
 
 
 }

@@ -134,11 +134,12 @@ public class LoginActivity extends AppCompatActivity {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
 
             Toast.makeText(getApplicationContext(), "Google SignIn Succesfull!", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            intent.putExtra("username", account.getDisplayName().toString());
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
         }catch (ApiException e){
             Log.w("GoogleSignInFailed", "signInResult:failed code=" + e.getStatusCode());
         }
     }
-
 
 }

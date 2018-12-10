@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -56,6 +57,7 @@ public class WeatherFragment extends Fragment {
     Place cityPlace;
     Button cityButton;
     LatLng deviceLocation;
+    ImageButton search;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,8 +74,7 @@ public class WeatherFragment extends Fragment {
         humidityValue = view.findViewById(R.id.textView_humidityValue);
         weatherPicture = view.findViewById(R.id.imageView_weatherPicture);
         weatherLocation = view.findViewById(R.id.textView_weather_location);
-        citySearch = view.findViewById(R.id.searchView_citySearch);
-
+        search = view.findViewById(R.id.imageButton_searchCity);
 //        cityButton.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -91,32 +92,61 @@ public class WeatherFragment extends Fragment {
       getWeatherWithCityName("London");
 
 
-        citySearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                String city = citySearch.getQuery().toString();
-                getWeatherWithCityName(city);
-                return false;
-            }
+//        citySearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                String city = citySearch.getQuery().toString();
+//                getWeatherWithCityName(city);
+//                return false;
+//            }
+//
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                return false;
+//            }
+//        });
 
+        search.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
+            public void onClick(View v) {
+                try{
+                    Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY).build((getActivity()));
+                    startActivityForResult(intent, 1);
+                }catch (GooglePlayServicesRepairableException e){
+                    e.printStackTrace();
+                }catch (GooglePlayServicesNotAvailableException e){
+                    e.printStackTrace();
+                }
             }
         });
+//
+//        citySearch.setOnSearchClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                try{
+//                    Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY).build((getActivity()));
+//                    startActivityForResult(intent, 1);
+//                }catch (GooglePlayServicesRepairableException e){
+//                    e.printStackTrace();
+//                }catch (GooglePlayServicesNotAvailableException e){
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
 
 //        deviceLocation = ((MainActivity)getActivity()).getLocation();
 //        System.out.println("latitude: " + deviceLocation.latitude + " long: " + deviceLocation.longitude);
         return view;
     }
 
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data){
-//        if(requestCode == 1){
-//             cityPlace = PlaceAutocomplete.getPlace(((MainActivity)getActivity()), data);
-//
-//        }
-//    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(requestCode == 1){
+             cityPlace = PlaceAutocomplete.getPlace(((MainActivity)getActivity()), data);
+             getWeatherWithCoord(cityPlace.getLatLng());
+             weatherLocation.setText("Weather for " + cityPlace.getName().toString());
+        }
+    }
 
     @Override
     public void onAttach(Context context) {
@@ -163,10 +193,10 @@ public class WeatherFragment extends Fragment {
 
     }
 
-    public void getWeatherWithCoord(){
+    public void getWeatherWithCoord(LatLng location){
 
-        String urlCoord ="http://api.openweathermap.org/data/2.5/weather?lat=" + "54.617611" +
-                "&lon=" + "-5.8718491" +
+        String urlCoord ="http://api.openweathermap.org/data/2.5/weather?lat=" + location.latitude +
+                "&lon=" + location.longitude +
                 "&units=" + "metric" +
                 "&appid=" + OPENWEATHERMAP_API_KEY;
         new GetWeatherTask().execute(urlCoord);

@@ -11,6 +11,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -31,8 +32,16 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
@@ -54,7 +63,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, stackOverflowFragment.OnFragmentInteractionListener, WeatherFragment.OnFragmentInteractionListener{
+        implements NavigationView.OnNavigationItemSelectedListener, stackOverflowFragment.OnFragmentInteractionListener, WeatherFragment.OnFragmentInteractionListener, SOQuestionDetails.OnFragmentInteractionListener{
 
     final private int REQUEST_COARSE_ACCESS = 123;
     boolean permissionGranted = false;
@@ -63,7 +72,7 @@ public class MainActivity extends AppCompatActivity
     LatLng deviceLocation;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     SearchView citySearch;
-
+    GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,14 +104,29 @@ public class MainActivity extends AppCompatActivity
         TextView textDate = headerView.findViewById(R.id.textView_date);
         Intent intent = getIntent();
         String loginName = intent.getStringExtra("username");
-        textWelcome.setText("Welcome, " + loginName);
-
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(MainActivity.this);
+        if(account != null){
+            textWelcome.setText("Welcome, " + account.getDisplayName());
+        }
+        else{
+            textWelcome.setText("Welcome, " + loginName);
+        }
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         Calendar c = Calendar.getInstance();
         textDate.setText(sdf.format(c.getTime()));
-
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
+    }
+    @Override
+    protected void onStart() {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+         mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+        mGoogleApiClient.connect();
+        super.onStart();
     }
 
     @Override
@@ -155,6 +179,14 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_stackOverflow) {
             fragment = new stackOverflowFragment();
         } else if (id == R.id.nav_LogOut) {
+            Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
+                @Override
+                public void onResult(@NonNull Status status) {
+                    Toast.makeText(getApplicationContext(),"Logged Out",Toast.LENGTH_SHORT).show();
+                    Intent i=new Intent(getApplicationContext(),LoginActivity.class);
+                    startActivity(i);
+                }
+            });
             finishAndRemoveTask();
         }
 
