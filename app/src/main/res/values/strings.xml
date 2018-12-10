@@ -17,4 +17,7 @@
     <string name="editText_confirmPassword">Confirm Password</string>
     <string name="textView_country">Country of Residence</string>
     <string name="button_createAccount">Create Account</string>
+    <string name="textView_temperature">Temperature</string>
+    <string name="textView_humidity">Humidity</string>
+    <string name="textView_windSpeed">Wind Speed</string>
 </resources>

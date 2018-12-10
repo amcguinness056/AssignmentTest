@@ -27,11 +27,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -58,6 +62,7 @@ public class MainActivity extends AppCompatActivity
     LocationListener locationListener;
     LatLng deviceLocation;
     private FusedLocationProviderClient mFusedLocationProviderClient;
+    SearchView citySearch;
 
 
     @Override
@@ -116,6 +121,13 @@ public class MainActivity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
+
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+//        if(requestCode == 1){
+//            Place place
+//        }
+//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
