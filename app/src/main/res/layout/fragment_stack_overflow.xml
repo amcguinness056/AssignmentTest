@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/stack_overflow_fragment"
     android:layout_width="match_parent"
@@ -29,12 +28,12 @@
         android:src="@mipmap/stackoverflow_logo" />
 
     <TableLayout
-        android:layout_width="324dp"
-        android:layout_height="351dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_alignStart="@+id/imageView_stackOverflow"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="-23dp"
-        android:layout_marginTop="136dp">
+        android:layout_marginStart="-48dp"
+        android:layout_marginTop="138dp">
 
         <TableRow
             android:id="@+id/tableRow_questionOne"
@@ -97,7 +96,7 @@
                 android:id="@+id/textView_question3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_gravity="center_vertical"
                 android:layout_weight="80"
                 android:text="Question 3"
                 android:textSize="16sp" />

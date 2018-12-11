@@ -81,7 +81,7 @@ public class LoginActivity extends AppCompatActivity {
         // the GoogleSignInAccount will be non-null.
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if(account != null){
-            Toast.makeText(getApplicationContext(), "User already signed in. Welcome back!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "User already signed in. Welcome back, " + account.getDisplayName(), Toast.LENGTH_LONG).show();
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
         }
         else{
@@ -135,7 +135,7 @@ public class LoginActivity extends AppCompatActivity {
 
             Toast.makeText(getApplicationContext(), "Google SignIn Succesfull!", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            intent.putExtra("username", account.getDisplayName().toString());
+            intent.putExtra("username", account.getDisplayName());
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
         }catch (ApiException e){
             Log.w("GoogleSignInFailed", "signInResult:failed code=" + e.getStatusCode());

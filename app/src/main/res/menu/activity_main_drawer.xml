@@ -5,6 +5,10 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/nav_Home"
+            android:icon="@mipmap/baseline_home_black_24dp"
+            android:title="Home"/>
+        <item
             android:id="@+id/nav_Weather"
             android:icon="@mipmap/icons8_partly_cloudy_day_24"
             android:title="Weather" />

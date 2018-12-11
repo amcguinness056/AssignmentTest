@@ -1,27 +1,20 @@
 package com.example.assignmenttest;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -41,22 +34,22 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 
 public class WeatherFragment extends Fragment {
 
     final private String OPENWEATHERMAP_API_KEY = "e553301132936704854765c1a440a400";
-    TextView temperatureValue;
     TextView windSpeedValue;
     TextView humidityValue;
     TextView weatherLocation;
+    TextView weatherSummary;
+    TextView currentTemp;
+    TextView maxTemp;
+    TextView minTemp;
+    TextView pressureValue;
     ImageView weatherPicture;
-    SearchView citySearch;
     Place cityPlace;
-    Button cityButton;
-    LatLng deviceLocation;
     ImageButton search;
 
     @Override
@@ -69,82 +62,43 @@ public class WeatherFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_weather, container, false);
-        temperatureValue = view.findViewById(R.id.textView_temperatureValue);
+        currentTemp = view.findViewById(R.id.textView_temperatureCurrent);
+        maxTemp = view.findViewById(R.id.textView_temperatureMax);
+        minTemp = view.findViewById(R.id.textView_temperatureMin);
+        pressureValue = view.findViewById(R.id.textView_pressureValue);
         windSpeedValue = view.findViewById(R.id.textView_windSpeedValue);
         humidityValue = view.findViewById(R.id.textView_humidityValue);
         weatherPicture = view.findViewById(R.id.imageView_weatherPicture);
         weatherLocation = view.findViewById(R.id.textView_weather_location);
         search = view.findViewById(R.id.imageButton_searchCity);
-//        cityButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                try{
-//                    Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN).build(((MainActivity)getActivity()));
-//                    startActivityForResult(intent, 1);
-//                }catch (GooglePlayServicesRepairableException e){
-//                    e.printStackTrace();
-//                }catch (GooglePlayServicesNotAvailableException e){
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
-
-      getWeatherWithCityName("London");
-
-
-//        citySearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//            @Override
-//            public boolean onQueryTextSubmit(String query) {
-//                String city = citySearch.getQuery().toString();
-//                getWeatherWithCityName(city);
-//                return false;
-//            }
-//
-//            @Override
-//            public boolean onQueryTextChange(String newText) {
-//                return false;
-//            }
-//        });
+        weatherSummary = view.findViewById(R.id.textView_summary);
+        getWeatherWithCityName("London");
 
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try{
+                try {
                     Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY).build((getActivity()));
                     startActivityForResult(intent, 1);
-                }catch (GooglePlayServicesRepairableException e){
+                } catch (GooglePlayServicesRepairableException e) {
                     e.printStackTrace();
-                }catch (GooglePlayServicesNotAvailableException e){
+                } catch (GooglePlayServicesNotAvailableException e) {
                     e.printStackTrace();
                 }
             }
         });
-//
-//        citySearch.setOnSearchClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                try{
-//                    Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY).build((getActivity()));
-//                    startActivityForResult(intent, 1);
-//                }catch (GooglePlayServicesRepairableException e){
-//                    e.printStackTrace();
-//                }catch (GooglePlayServicesNotAvailableException e){
-//                    e.printStackTrace();
-//                }
-//            }
-//        });
 
-//        deviceLocation = ((MainActivity)getActivity()).getLocation();
-//        System.out.println("latitude: " + deviceLocation.latitude + " long: " + deviceLocation.longitude);
         return view;
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data){
-        if(requestCode == 1){
-             cityPlace = PlaceAutocomplete.getPlace(((MainActivity)getActivity()), data);
-             getWeatherWithCoord(cityPlace.getLatLng());
-             weatherLocation.setText("Weather for " + cityPlace.getName().toString());
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1) {
+            cityPlace = PlaceAutocomplete.getPlace(getActivity(), data);
+            if(cityPlace != null){
+                getWeatherWithCoord(cityPlace.getLatLng());
+                weatherLocation.setText("Weather for " + cityPlace.getName().toString());
+            }
         }
     }
 
@@ -171,21 +125,20 @@ public class WeatherFragment extends Fragment {
         URL url = new URL(urlString);
         URLConnection conn = url.openConnection();
 
-        if(! (conn instanceof HttpURLConnection))
+        if (!(conn instanceof HttpURLConnection))
             throw new IOException("Not an HTTP connection");
-        try{
+        try {
             HttpURLConnection httpConn = (HttpURLConnection) conn;
             httpConn.setAllowUserInteraction(false);
             httpConn.setInstanceFollowRedirects(true);
             httpConn.setRequestMethod("GET");
             httpConn.connect();
             response = httpConn.getResponseCode();
-            if(response == HttpURLConnection.HTTP_OK){
+            if (response == HttpURLConnection.HTTP_OK) {
                 in = httpConn.getInputStream();
             }
             return in;
-        }
-        catch(Exception ex){
+        } catch (Exception ex) {
             Log.d("Networking", ex.getLocalizedMessage());
             throw new IOException("Error connecting");
         }
@@ -193,16 +146,16 @@ public class WeatherFragment extends Fragment {
 
     }
 
-    public void getWeatherWithCoord(LatLng location){
+    public void getWeatherWithCoord(LatLng location) {
 
-        String urlCoord ="http://api.openweathermap.org/data/2.5/weather?lat=" + location.latitude +
+        String urlCoord = "http://api.openweathermap.org/data/2.5/weather?lat=" + location.latitude +
                 "&lon=" + location.longitude +
                 "&units=" + "metric" +
                 "&appid=" + OPENWEATHERMAP_API_KEY;
         new GetWeatherTask().execute(urlCoord);
     }
 
-    public void getWeatherWithCityName(String cityName){
+    public void getWeatherWithCityName(String cityName) {
         String UrlCity = "http://api.openweathermap.org/data/2.5/weather?q="
                 + cityName
                 + "&units=" + "metric"
@@ -213,7 +166,6 @@ public class WeatherFragment extends Fragment {
     }
 
 
-
     private class GetWeatherTask extends AsyncTask<String, Void, HashMap<String, String>> {
 
         @Override
@@ -222,9 +174,12 @@ public class WeatherFragment extends Fragment {
             String temperature = "UNDEFINED";
             String windSpeed = "UNDEFINED";
             String humidity = "UNDEFINED";
+            String pressure = "UNDEFINED";
             String weatherSummary = "UNDEFINED";
+            String tempMin = "UNDEFINED";
+            String tempMax = "UNDEFINED";
 
-            try{
+            try {
                 URL url = new URL(strings[0]);
                 HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
@@ -233,7 +188,7 @@ public class WeatherFragment extends Fragment {
                 StringBuilder builder = new StringBuilder();
 
                 String inputString;
-                while((inputString = bufferedReader.readLine()) != null){
+                while ((inputString = bufferedReader.readLine()) != null) {
                     builder.append(inputString);
                 }
 
@@ -247,15 +202,21 @@ public class WeatherFragment extends Fragment {
                 weatherDetails.put("temperature", temperature);
                 weatherDetails.put("windSpeed", windSpeed);
                 weatherDetails.put("humidity", humidity);
+                weatherDetails.put("pressure", String.valueOf(main.getDouble("pressure")));
+                weatherDetails.put("tempMin", String.valueOf(main.getDouble("temp_min")));
+                weatherDetails.put("tempMax", String.valueOf(main.getDouble("temp_max")));
                 JSONObject weather = new JSONObject();
-                for(int i = 0; i< weatherArray.length(); i++){
-                     weather = weatherArray.getJSONObject(i);
+                for (int i = 0; i < weatherArray.length(); i++) {
+                    weather = weatherArray.getJSONObject(i);
                 }
                 weatherSummary = String.valueOf(weather.getString("main"));
                 weatherDetails.put("summary", weatherSummary);
+                weatherDetails.put("description", String.valueOf(weather.getString("description")));
+                weatherDetails.put("icon", String.valueOf(weather.getString("icon")));
+
 
                 urlConnection.disconnect();
-            } catch (IOException | JSONException e){
+            } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
 
@@ -263,31 +224,47 @@ public class WeatherFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(HashMap<String, String> weatherDetails){
-            temperatureValue.setText(weatherDetails.get("temperature") + "C");
+        protected void onPostExecute(HashMap<String, String> weatherDetails) {
+            currentTemp.setText("Current Temp: " + weatherDetails.get("temperature") + "C");
+            minTemp.setText("Min Temp: " + weatherDetails.get("tempMin") + "C");
+            maxTemp.setText("Max Temp: " + weatherDetails.get("tempMax") + "C");
+            pressureValue.setText(weatherDetails.get("pressure") + "mb");
             windSpeedValue.setText(weatherDetails.get("windSpeed") + "mph");
             humidityValue.setText(weatherDetails.get("humidity") + "%");
-
-            switch (weatherDetails.get("summary")){
-                case "Clouds":
-                    weatherPicture.setImageResource(R.mipmap.icons8_partly_cloudy_day_96);
-                    break;
-                case "Rain":
-                    weatherPicture.setImageResource(R.mipmap.icons8_rain_96);
-                    break;
-                case "Sun":
-                    weatherPicture.setImageResource(R.mipmap.icons8_sun_96);
-                    break;
-                case "Clear":
-                    weatherPicture.setImageResource(R.mipmap.icons8_sun_96);
-                    break;
-                case "Snow":
-                    weatherPicture.setImageResource(R.mipmap.icons8_snow_96);
-                    break;
-                    default:
-                        weatherPicture.setImageResource(R.mipmap.icons8_partly_cloudy_day_96);
-            }
+            weatherSummary.setText(weatherDetails.get("summary"));
+            String iconExt = weatherDetails.get("icon");
+            String url = "http://openweathermap.org/img/w/" + iconExt + ".png";
+            new DownloadImageTask((ImageView) getView().findViewById(R.id.imageView_weatherPicture))
+                    .execute(url);
         }
     }
+
+        private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+            ImageView bmImage;
+
+            public DownloadImageTask(ImageView bmImage) {
+                this.bmImage = bmImage;
+            }
+
+            @Override
+            protected Bitmap doInBackground(String... urls) {
+                String urldisplay = urls[0];
+                Bitmap mIcon11 = null;
+                try {
+                    InputStream in = new java.net.URL(urldisplay).openStream();
+                    mIcon11 = BitmapFactory.decodeStream(in);
+                } catch (Exception e) {
+                    Log.e("Error", e.getMessage());
+                    e.printStackTrace();
+                }
+                return mIcon11;
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap result) {
+                bmImage.setImageBitmap(result);
+            }
+        }
+
 
 }

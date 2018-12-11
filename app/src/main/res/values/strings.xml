@@ -20,4 +20,5 @@
     <string name="textView_temperature">Temperature</string>
     <string name="textView_humidity">Humidity</string>
     <string name="textView_windSpeed">Wind Speed</string>
+    <string name="textView_welcomeParagraph">This app provides functionality to search for the weather and find questions on stackOverflow</string>
 </resources>
