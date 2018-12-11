@@ -1,6 +1,9 @@
 package com.example.assignmenttest;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -74,6 +77,10 @@ public class MainActivity extends AppCompatActivity
         tx.replace(R.id.content_main, new WelcomeFragment());
         tx.commit();
 
+        if(!isNetworkAvailable()){
+            Toast.makeText(getApplicationContext(), "NO ACTIVE INTERNET CONNECTION", Toast.LENGTH_LONG).show();
+        }
+
     }
     @Override
     protected void onStart() {
@@ -85,6 +92,13 @@ public class MainActivity extends AppCompatActivity
                 .build();
         mGoogleApiClient.connect();
         super.onStart();
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     @Override

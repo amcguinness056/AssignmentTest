@@ -163,13 +163,14 @@
 
     <ImageView
         android:id="@+id/imageView_weatherPicture"
-        android:layout_width="107dp"
-        android:layout_height="66dp"
+        android:layout_width="141dp"
+        android:layout_height="89dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="143dp"
-        android:layout_marginTop="156dp"
-        android:src="@mipmap/icons8_partly_cloudy_day_96" />
+        android:layout_marginStart="123dp"
+        android:layout_marginTop="152dp"
+        android:src="@mipmap/icons8_partly_cloudy_day_96"
+        android:scaleType="centerCrop"/>
 
     <ImageButton
         android:id="@+id/imageButton_searchCity"

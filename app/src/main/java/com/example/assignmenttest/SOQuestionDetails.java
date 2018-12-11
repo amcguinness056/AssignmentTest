@@ -1,6 +1,8 @@
 package com.example.assignmenttest;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.Toast;
 
 
 public class SOQuestionDetails extends Fragment {
@@ -38,6 +41,10 @@ public class SOQuestionDetails extends Fragment {
         questionLink = (getArguments().getString("questionLink"));
         webView = view.findViewById(R.id.webView);
         webView.loadUrl(questionLink);
+        if(!isNetworkAvailable()){
+            Toast.makeText(getActivity().getApplicationContext(), "NO ACTIVE INTERNET CONNECTION", Toast.LENGTH_LONG).show();
+        }
+
         return view;
 
     }
@@ -47,6 +54,13 @@ public class SOQuestionDetails extends Fragment {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     @Override
