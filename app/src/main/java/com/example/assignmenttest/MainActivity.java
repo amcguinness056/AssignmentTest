@@ -2,6 +2,10 @@ package com.example.assignmenttest;
 
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -29,17 +33,19 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, stackOverflowFragment.OnFragmentInteractionListener, WeatherFragment.OnFragmentInteractionListener, SOQuestionDetails.OnFragmentInteractionListener, WelcomeFragment.OnFragmentInteractionListener{
+        implements NavigationView.OnNavigationItemSelectedListener, stackOverflowFragment.OnFragmentInteractionListener, WeatherFragment.OnFragmentInteractionListener, SOQuestionDetails.OnFragmentInteractionListener, WelcomeFragment.OnFragmentInteractionListener,
+        SensorEventListener {
 
-    LatLng deviceLocation;
     GoogleApiClient mGoogleApiClient;
+    private SensorManager sensorManager;
+    private long lastUpdateTime;
+    private static float SHAKE_THRESHOLD_GRAVITY = 2;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +87,12 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(getApplicationContext(), "NO ACTIVE INTERNET CONNECTION", Toast.LENGTH_LONG).show();
         }
 
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        sensorManager.registerListener(this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                SensorManager.SENSOR_DELAY_NORMAL);
+        lastUpdateTime = System.currentTimeMillis();
+
     }
     @Override
     protected void onStart() {
@@ -92,6 +104,22 @@ public class MainActivity extends AppCompatActivity
                 .build();
         mGoogleApiClient.connect();
         super.onStart();
+    }
+
+    @Override
+    public void onPause(){
+        super.onPause();
+        sensorManager.unregisterListener(this);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        sensorManager.registerListener(this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                SensorManager.SENSOR_DELAY_NORMAL);
+
     }
 
     private boolean isNetworkAvailable() {
@@ -175,4 +203,44 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
+            getAccelerometer(event);
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    private void getAccelerometer(SensorEvent event){
+        float[] values = event.values;
+
+        float x = values[0];
+        float y = values[1];
+        float z = values[2];
+
+        float gX = x / SensorManager.GRAVITY_EARTH;
+        float gY = y / SensorManager.GRAVITY_EARTH;
+        float gZ = z / SensorManager.GRAVITY_EARTH;
+
+        float gForce = (float) Math.sqrt(gX * gX + gY * gY + gZ * gZ);
+
+        long currentTime = System.currentTimeMillis();
+        if(gForce >= SHAKE_THRESHOLD_GRAVITY){
+            if(currentTime - lastUpdateTime < 200){
+                return;
+            }
+            lastUpdateTime = currentTime;
+            Toast.makeText(getApplicationContext(), "Device was shaken", Toast.LENGTH_LONG);
+            Fragment fragment = new stackOverflowFragment();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.content_main, fragment);
+            fragmentTransaction.commit();
+        }
+    }
 }

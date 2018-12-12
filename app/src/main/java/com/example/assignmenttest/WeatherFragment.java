@@ -36,7 +36,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.HashMap;
 
 
@@ -91,11 +90,19 @@ public class WeatherFragment extends Fragment {
             }
         });
 
-        if(!isNetworkAvailable()){
+        if(!isNetworkAvailable()) {
             Toast.makeText(getActivity().getApplicationContext(), "NO ACTIVE INTERNET CONNECTION", Toast.LENGTH_LONG).show();
         }
 
         return view;
+    }
+
+
+
+    @Override
+    public void onPause(){
+        super.onPause();
+
     }
 
     @Override
@@ -161,10 +168,8 @@ public class WeatherFragment extends Fragment {
             String temperature = "UNDEFINED";
             String windSpeed = "UNDEFINED";
             String humidity = "UNDEFINED";
-            String pressure = "UNDEFINED";
             String weatherSummary = "UNDEFINED";
-            String tempMin = "UNDEFINED";
-            String tempMax = "UNDEFINED";
+
 
             try {
                 URL url = new URL(strings[0]);
@@ -252,6 +257,5 @@ public class WeatherFragment extends Fragment {
                 bmImage.setImageBitmap(result);
             }
         }
-
 
 }
